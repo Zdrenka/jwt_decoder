@@ -18,36 +18,36 @@
   </head>
   <body>
     <div class="container-fluid main" style="width: 500px">
-      <!-- <h2 class="text-center">JWT Decoder</h2>
-        <input id="token"></input>
-        <button class="btn btn-primary" id="go">Decode</button>
-         -->
-
       <div class="input-group mb-3">
         <input
           type="text"
           class="form-control"
-          placeholder="JWT Token"
+          placeholder="Token"
           id="token"
-          aria-label="JWT Token"
+          aria-label="Token"
           aria-describedby="basic-addon2"
         />
         <div class="input-group-append">
-          <button class="btn btn-outline-secondary" id="go" type="button">
+          <button class="btn btn-success" id="decode" type="button">
             Decode
           </button>
         </div>
       </div>
 
       <pre id="decoded"></pre>
-      <!-- <form>
-        <div class="form-group">
-            <label for="token">Token</label>
-            <input type="email" class="form-control" id="token" aria-describedby="emailHelp" placeholder="JWT">
-            <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
-        </div>
-        <button type="submit" class="btn btn-primary" id="go">Decode</button>
-        </form> -->
+
+      <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+        <button
+          class="btn btn-outline-success btn-sm me-md-2"
+          id="copy"
+          type="button"
+        >
+          Copy
+        </button>
+        <button class="btn btn-outline-danger btn-sm" id="clear" type="button">
+          Clear
+        </button>
+      </div>
     </div>
   </body>
   <script src="script.js"></script>
