@@ -1,9 +1,13 @@
 var stack = [];
 
 let token = document.getElementById("token");
-let decoded = document.getElementById("decoded");
+let container = document.getElementById("container");
+let header = document.getElementById("header");
+let payload = document.getElementById("payload");
 
 let copyButton = document.getElementById("copy");
+let copyPayloadButton = document.getElementById("copy_payload");
+let copyHeaderButton = document.getElementById("copy_header");
 let clearButton = document.getElementById("clear");
 let decodeButton = document.getElementById("decode");
 
@@ -17,7 +21,8 @@ function get_data() {
     function (items) {
       if (Array.isArray(items.stack)) {
         token.value = items.stack[0].token;
-        decoded.textContent = items.stack[0].result;
+        header.textContent = items.stack[0].result.header;
+        payload.textContent = items.stack[0].result.payload;
         toggleButtons();
         console.log("got data");
       }
@@ -39,44 +44,77 @@ function storeToken(stack) {
 function decodeJWT() {
   stack.push({
     token: token.value,
-    result: (decoded.textContent = JSON.stringify(
-      parseJwt(token.value),
-      null,
-      2
-    )),
+    result: {
+      header: (header.textContent = JSON.stringify(
+        parseJwt(token.value, 0),
+        null,
+        2
+      )),
+      payload: (payload.textContent = JSON.stringify(
+        parseJwt(token.value, 1),
+        null,
+        2
+      )),
+    },
   });
+
   storeToken(stack);
   toggleButtons();
 }
 
 function toggleButtons() {
-  let display = decoded.textContent.length > 0 ? "block" : "none";
-  copyButton.style.display = display;
-  clearButton.style.display = display;
+  let payloadDisplay = payload.textContent.length > 0 ? "block" : "none";
+  let headerDisplay = header.textContent.length > 0 ? "block" : "none";
+
+  copyButton.style.display =
+    payloadDisplay === "block" || headerDisplay === "block" ? "block" : "none";
+  clearButton.style.display =
+    payloadDisplay === "block" || headerDisplay === "block" ? "block" : "none";
+  container.style.display =
+    payloadDisplay === "block" || headerDisplay === "block" ? "block" : "none";
 }
 
-function parseJwt(token) {
-  var base64Url = token.split(".")[1];
-  var base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-  var jsonPayload = decodeURIComponent(
+function parseJwt(token, part) {
+  var body = token.split(".")[part].replace(/-/g, "+").replace(/_/g, "/");
+  var payload = decode(body);
+  return JSON.parse(payload);
+}
+
+function decode(data) {
+  return decodeURIComponent(
     window
-      .atob(base64)
+      .atob(data)
       .split("")
       .map(function (c) {
         return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
       })
       .join("")
   );
-
-  return JSON.parse(jsonPayload);
 }
 
-function copyText() {
-  navigator.clipboard.writeText(decoded.textContent);
-
+function copyAll() {
+  navigator.clipboard.writeText(
+    header.textContent + "\n" + payload.textContent
+  );
   copyButton.textContent = "Copied!";
   setTimeout(function () {
-    copyButton.textContent = "Copy";
+    copyButton.textContent = "Copy All";
+  }, 750);
+}
+
+function copyHeader() {
+  navigator.clipboard.writeText(header.textContent);
+  copyHeaderButton.textContent = "Copied!";
+  setTimeout(function () {
+    copyHeaderButton.textContent = "Copy";
+  }, 750);
+}
+
+function copyPayload() {
+  navigator.clipboard.writeText(payload.textContent);
+  copyPayloadButton.textContent = "Copied!";
+  setTimeout(function () {
+    copyPayloadButton.textContent = "Copy";
   }, 750);
 }
 
@@ -89,7 +127,8 @@ function options() {
 }
 
 function clear() {
-  decoded.textContent = "";
+  header.textContent = "";
+  payload.textContent = "";
   token.value = "";
   chrome.storage.sync.clear();
   toggleButtons();
@@ -99,7 +138,9 @@ function clear() {
 copyButton.style.display = "none";
 clearButton.style.display = "none";
 
-copyButton.addEventListener("click", copyText);
+copyButton.addEventListener("click", copyAll);
+copyPayloadButton.addEventListener("click", copyPayload);
+copyHeaderButton.addEventListener("click", copyHeader);
 decodeButton.addEventListener("click", decodeJWT);
 clearButton.addEventListener("click", clear);
 
