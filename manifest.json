@@ -1,6 +1,6 @@
 {
   "name": "JWT Decoder",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Tool to decode JWT tokens",
   "manifest_version": 3,
   "author": "Karl Lankester-Carthy",
