@@ -1,123 +1,175 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>JWT Decoder</title>
-    <style>
-      body {
-        text-align: center;
-        overflow: hidden;
-      }
-      .main {
-        padding: 15px;
-      }
 
-      pre {
-        overflow-x: clip;
-        max-height: 330px;
-      }
+<head>
+  <title>JWT Decoder</title>
+  <style>
+    body {
+      text-align: center;
+      overflow: hidden;
+      /* padding: 15px; */
+      background-color: #fff;
+      color: #000;
+      width:max-content;
+      transition: background-color 0.3s, color 0.3s;
+      max-height: max-content;
+    }
 
-      #copy_payload {
-        display: none;
-      }
+    .dark-mode {
+      background-color: #101e2a;
+      color: #d1d1d1;
+    }
 
-      #dataPayload:hover {
-        background-color: #e5e5e5;
-        border-radius: 5px;
-      }
+    .main {
+      padding: 15px;
+      line-height: normal;
+    }
 
-      #dataPayload:hover #copy_payload {
-        display: block;
-        position: absolute;
-        right: 12px;
-      }
+    pre {
+      overflow-x: clip;
+      max-height: max-content;
+    }
 
-      #copy_header {
-        display: none;
-      }
+    .svg-icon {
+      width: 24px;
+      height: 24px;
+      fill: rgb(183, 183, 5);
+    }
 
-      #headerPayload:hover {
-        background-color: #e5e5e5;
-        border-radius: 5px;
-      }
+    .svg-background {
+      width: 24px;
+      height: 24px;
+      fill: rgb(183, 183, 5);
+      position: absolute;
+    }
 
-      #headerPayload:hover #copy_header {
-        display: block;
-        position: absolute;
-        right: 12px;
-      }
+    .svg-foreground {
+      width: 24px;
+      height: 24px;
+      fill: rgb(0, 0, 0);
+      position: absolute;
+    }
 
-      /* 
-      .shots:hover .overlay {
-        display: block;
-        background: rgba(0, 0, 0, 0.1);
-        margin-right: 0px;
-        text-align: center;
-        vertical-align: middle;
-        line-height: 200px;
-      } */
-    </style>
-    <meta charset="utf-8" />
-    <link
-      href="https://unpkg.com/bootstrap/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-  </head>
-  <body>
-    <div class="container-fluid main" style="width: 500px">
-      <div class="input-group mb-3">
-        <input
-          type="text"
-          class="form-control"
-          placeholder="Token"
-          id="token"
-          aria-label="Token"
-          aria-describedby="basic-addon2"
-        />
-        <div class="input-group-append">
-          <button class="btn btn-success" id="decode" type="button">
-            Decode
-          </button>
-        </div>
-      </div>
-      <div id="container">
-        <div id="headerPayload">
-          <button
-            class="btn btn-success btn-sm"
-            id="copy_header"
-            type="button"
-            style="font-size: small; float: right"
-          >
-            Copy
-          </button>
-          <pre id="header"></pre>
-        </div>
+    .rounded-input {
+      border-radius: 1rem;
+    }
 
-        <div id="dataPayload" class="overlay">
-          <button
-            class="btn btn-success btn-sm"
-            id="copy_payload"
-            type="button"
-            style="font-size: small; float: right; height: auto"
-          >
-            Copy
-          </button>
-          <pre id="payload"></pre>
-        </div>
-      </div>
+    #copy_payload {
+      display: none;
+    }
 
-      <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-        <button
-          class="btn btn-outline-success btn-sm me-md-2"
-          id="copy"
-          type="button"
-        >
-          Copy All
+    #dataPayload:hover {
+      background-color: #e5e5e5;
+      border-radius: 5px;
+    }
+
+    #dataPayload:hover #copy_payload {
+      display: block;
+      position: absolute;
+      right: 12px;
+    }
+
+    #copy_header {
+      display: none;
+    }
+
+    #headerPayload:hover {
+      background-color: #e5e5e5;
+      border-radius: 5px;
+    }
+
+    #headerPayload:hover #copy_header {
+      display: block;
+      position: absolute;
+      right: 12px;
+    }
+
+    .dark-mode .svg-icon {
+      fill: currentColor;
+    }
+
+    .dark-mode #dataPayload:hover,
+    .dark-mode #headerPayload:hover {
+      background-color: #182d3e;
+    }
+
+    .dark-mode input {
+      background-color: #101e2a;
+      color: #d1d1d1;
+    }
+
+    .dark-mode .btn {
+      background-color: #101e2a;
+      color: #d1d1d1;
+    }
+
+    .dark-mode pre {
+      scrollbar-color: #d1d1d1 #101e2a;
+    }
+
+    .toggle-btn {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+
+    .input-style {
+      padding-right: 10px;
+      padding-left: 10px;
+    }
+
+  </style>
+  <meta charset="utf-8" />
+  <link href="https://unpkg.com/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+</head>
+
+<body>
+  <div class="container-fluid main" style="width: 500px">
+
+    <div class="input-group mb-3">
+      <button class="btn btn-outline-secondary" type="button" id="toggle-theme">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="svg-icon bi-lightbulb-fill"
+        viewBox="0 0 16 16">
+        <path
+          d="M2 6a6 6 0 1 1 10.174 4.31c-.203.196-.359.4-.453.619l-.762 1.769A.5.5 0 0 1 10.5 13h-5a.5.5 0 0 1-.46-.302l-.761-1.77a2 2 0 0 0-.453-.618A5.98 5.98 0 0 1 2 6m3 8.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1l-.224.447a1 1 0 0 1-.894.553H6.618a1 1 0 0 1-.894-.553L5.5 15a.5.5 0 0 1-.5-.5" />
+       </svg>
+
+      </button>
+      <input type="text" class="form-control input-style" placeholder="Token" id="token" aria-label="Token"
+        aria-describedby="basic-addon2" />
+      <button class="btn btn-success" type="button" id="decode">Decode</button>
+    </div>
+    <div id="container">
+      <div id="headerPayload">
+        <button class="btn btn-success btn-sm" id="copy_header" type="button" style="font-size: small; float: right">
+          Copy
         </button>
-        <button class="btn btn-outline-danger btn-sm" id="clear" type="button">
-          Clear
+        <pre id="header"></pre>
+      </div>
+
+      <div id="dataPayload" class="overlay">
+        <button class="btn btn-success btn-sm" id="copy_payload" type="button"
+          style="font-size: small; float: right; height: auto">
+          Copy
         </button>
+        <pre id="payload"></pre>
       </div>
     </div>
-  </body>
-  <script src="script.js"></script>
+
+    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+      <button class="btn btn-outline-success btn-sm me-md-2" id="copy" type="button">
+        Copy All
+      </button>
+      <button class="btn btn-outline-danger btn-sm" id="clear" type="button">
+        Clear
+      </button>
+    </div>
+  </div>
+</body>
+<script src="script.js"></script>
+
 </html>
